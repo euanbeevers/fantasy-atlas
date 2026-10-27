@@ -1,0 +1,247 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fantasy Atlas</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #171421;
+            font-family: "Segoe UI", sans-serif;
+        }
+
+        #map-container {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            position: relative;
+            cursor: grab;
+            user-select: none;
+            touch-action: none;
+        }
+
+        #map-container.dragging {
+            cursor: grabbing;
+        }
+
+        #world-map {
+            position: absolute;
+            top: 0;
+            left: 0;
+            max-width: none;
+            pointer-events: none;
+            transform-origin: top left;
+            -webkit-user-drag: none;
+            image-rendering: auto;
+        }
+
+        /* Floating zoom controls */
+        #zoom-controls {
+            position: absolute;
+            right: 24px;
+            bottom: 24px;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            touch-action: manipulation;
+        }
+
+        .zoom-button {
+            width: 48px;
+            height: 48px;
+            border: 1px solid rgba(255, 242, 194, 0.3);
+            border-radius: 14px;
+            background: rgba(23, 20, 33, 0.72);
+            color: #fff2c2;
+            font-size: 28px;
+            font-weight: 300;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+            transition:
+                background 0.2s ease,
+                border-color 0.2s ease,
+                transform 0.2s ease;
+        }
+
+        .zoom-button:hover {
+            background: rgba(65, 53, 82, 0.92);
+            border-color: rgba(255, 242, 194, 0.7);
+            transform: scale(1.06);
+        }
+
+        .zoom-button:active {
+            transform: scale(0.94);
+        }
+
+        .zoom-button:focus-visible {
+            outline: 2px solid #e8c46a;
+            outline-offset: 3px;
+        }
+
+        @media (max-width: 600px) {
+            #zoom-controls {
+                right: 16px;
+                bottom: 16px;
+            }
+
+            .zoom-button {
+                width: 46px;
+                height: 46px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map-container">
+        <img
+            id="world-map"
+            src="world_map.png"
+            alt="Fantasy world map"
+            draggable="false"
+        >
+
+        <div id="zoom-controls">
+            <button
+                class="zoom-button"
+                id="zoom-in"
+                type="button"
+                aria-label="Zoom in"
+                title="Zoom in"
+            >+</button>
+
+            <button
+                class="zoom-button"
+                id="zoom-out"
+                type="button"
+                aria-label="Zoom out"
+                title="Zoom out"
+            >−</button>
+        </div>
+    </div>
+
+    <script>
+        const container = document.getElementById("map-container");
+        const map = document.getElementById("world-map");
+
+        let zoom = 1;
+        const minZoom = 0.25;
+        const maxZoom = 5;
+
+        let offsetX = 0;
+        let offsetY = 0;
+
+        let dragging = false;
+        let lastX = 0;
+        let lastY = 0;
+
+        function drawMap() {
+            map.style.transform =
+                `translate(${offsetX}px, ${offsetY}px) scale(${zoom})`;
+        }
+
+        function zoomMap(factor, mouseX, mouseY) {
+            const oldZoom = zoom;
+
+            zoom = Math.max(
+                minZoom,
+                Math.min(maxZoom, zoom * factor)
+            );
+
+            if (zoom === oldZoom) return;
+
+            // Keep the chosen point in the same screen position
+            offsetX = mouseX - (mouseX - offsetX) * (zoom / oldZoom);
+            offsetY = mouseY - (mouseY - offsetY) * (zoom / oldZoom);
+
+            drawMap();
+        }
+
+        // Mouse-wheel zooming
+        container.addEventListener("wheel", function(event) {
+            event.preventDefault();
+
+            const rect = container.getBoundingClientRect();
+            const mouseX = event.clientX - rect.left;
+            const mouseY = event.clientY - rect.top;
+
+            zoomMap(
+                event.deltaY < 0 ? 1.15 : 1 / 1.15,
+                mouseX,
+                mouseY
+            );
+        }, { passive: false });
+
+        // Zoom buttons: zoom towards the centre of the screen
+        document.getElementById("zoom-in").addEventListener("click", function() {
+            zoomMap(
+                1.25,
+                container.clientWidth / 2,
+                container.clientHeight / 2
+            );
+        });
+
+        document.getElementById("zoom-out").addEventListener("click", function() {
+            zoomMap(
+                1 / 1.25,
+                container.clientWidth / 2,
+                container.clientHeight / 2
+            );
+        });
+
+        // Click-and-drag map movement
+        container.addEventListener("pointerdown", function(event) {
+            if (event.button !== 0) return;
+
+            // Don't start dragging when a zoom button is clicked
+            if (event.target.closest("button")) return;
+
+            dragging = true;
+            lastX = event.clientX;
+            lastY = event.clientY;
+
+            container.classList.add("dragging");
+            container.setPointerCapture(event.pointerId);
+        });
+
+        container.addEventListener("pointermove", function(event) {
+            if (!dragging) return;
+
+            offsetX += event.clientX - lastX;
+            offsetY += event.clientY - lastY;
+
+            lastX = event.clientX;
+            lastY = event.clientY;
+
+            drawMap();
+        });
+
+        function stopDragging() {
+            dragging = false;
+            container.classList.remove("dragging");
+        }
+
+        container.addEventListener("pointerup", stopDragging);
+        container.addEventListener("pointercancel", stopDragging);
+
+        drawMap();
+    </script>
+</body>
+</html>

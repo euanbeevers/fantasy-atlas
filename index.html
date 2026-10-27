@@ -14,21 +14,58 @@
         }
 
         html, body {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background: #171421;
-            font-family: "Segoe UI", sans-serif;
-        }
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #15151b;
+    font-family: "Segoe UI", sans-serif;
+}
+
+#atlas-header {
+    height: 82px;
+    padding: 0 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #1b1b23;
+    border-bottom: 1px solid #353541;
+    color: #f0eee8;
+}
+
+#atlas-header h1 {
+    font-size: 19px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    color: #e4d3a2;
+}
+
+#atlas-header p {
+    margin-top: 5px;
+    color: #9999a8;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+}
+
+#atlas-status {
+    padding: 7px 11px;
+    border: 1px solid #41414e;
+    border-radius: 5px;
+    color: #c4b88a;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+}
 
         #map-container {
             width: 100%;
-            height: 100%;
+            height: calc(100% - 82px);
             overflow: hidden;
             position: relative;
             cursor: grab;
             user-select: none;
             touch-action: none;
+
+            background: #101015;
+            box-shadow: inset 0 0 0 1px #353541;
         }
 
         #map-container.dragging {
@@ -81,8 +118,8 @@
         }
 
         .zoom-button:hover {
-            background: rgba(65, 53, 82, 0.92);
-            border-color: rgba(255, 242, 194, 0.7);
+            background: rgba(48, 48, 61, 0.96);
+            border-color: rgba(228, 211, 162, 0.65);
             transform: scale(1.06);
         }
 
@@ -106,10 +143,475 @@
                 height: 46px;
             }
         }
+
+
+        /* Dungeon Master toolbar */
+        #dm-toolbar {
+            position: relative;
+            z-index: 20;
+            background: #1b1b23;
+            border-bottom: 1px solid #353541;
+            color: #f0eee8;
+        }
+
+        #toolbar-toggle {
+            width: 100%;
+            padding: 10px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: transparent;
+            border: none;
+            color: #e4d3a2;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            cursor: pointer;
+        }
+
+        #toolbar-toggle:hover {
+            background: #252530;
+        }
+
+        #toolbar-arrow {
+            font-size: 10px;
+            transition: transform 0.2s ease;
+        }
+
+        #toolbar-content {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 0 24px 14px;
+        }
+
+        #toolbar-content button {
+            padding: 9px 14px;
+            background: #252530;
+            border: 1px solid #41414e;
+            border-radius: 5px;
+            color: #e5e3ec;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background 0.2s ease, border-color 0.2s ease;
+        }
+
+        #toolbar-content button:hover {
+            background: #30303d;
+            border-color: #c4b88a;
+        }
+
+        #toolbar-hint {
+            color: #9999a8;
+            font-size: 11px;
+        }
+
+/* Lore Sidebar */
+#lore-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 290px;
+    z-index: 30;
+    background: #1b1b23;
+    border-right: 1px solid #353541;
+    color: #f0eee8;
+    transform: translateX(-290px);
+    transition: transform 0.25s ease;
+}
+
+#lore-sidebar.open {
+    transform: translateX(0);
+}
+
+#lore-toggle {
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    transform: translateY(-50%);
+    width: 28px;
+    height: 64px;
+    border: 1px solid #41414e;
+    border-left: none;
+    border-radius: 0 8px 8px 0;
+    background: #1b1b23;
+    color: #e4d3a2;
+    cursor: pointer;
+}
+
+#lore-content {
+    padding: 28px 18px;
+}
+
+#lore-content h2 {
+    color: #e4d3a2;
+    font-size: 15px;
+    letter-spacing: 3px;
+}
+
+.lore-subtitle {
+    margin-top: 8px;
+    margin-bottom: 28px;
+    color: #9999a8;
+    font-size: 12px;
+}
+
+.lore-category {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    padding: 16px 12px;
+    background: #252530;
+    border: 1px solid #41414e;
+    border-radius: 7px;
+    color: #f0eee8;
+    text-align: left;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.lore-category:hover {
+    background: #30303d;
+    border-color: #c4b88a;
+}
+
+.category-arrow {
+    margin-left: auto;
+    color: #e4d3a2;
+    font-size: 16px;
+    line-height: 1;
+}
+
+
+/* Settlement list */
+#locations-list {
+    margin-top: 4px;
+    padding-bottom: 20px;
+}
+
+.location-item {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+    padding: 12px;
+    margin-bottom: 6px;
+    background: #20202a;
+    border: 1px solid #353541;
+    border-radius: 5px;
+    color: #f0eee8;
+    text-align: left;
+    cursor: pointer;
+}
+
+.location-item span {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.location-item small {
+    color: #9999a8;
+    font-size: 11px;
+}
+
+.location-item:hover {
+    background: #30303d;
+    border-color: #c4b88a;
+}
+
+#lore-sidebar {
+    overflow: visible;
+}
+
+#lore-content {
+    max-height: 100vh;
+    overflow-y: auto;
+}
+
+/* Marker options - match the sidebar theme */
+#markers-content button {
+    width: 100%;
+    padding: 16px 12px;
+    margin-bottom: 8px;
+    background: #252530;
+    border: 1px solid #41414e;
+    border-radius: 7px;
+    color: #f0eee8;
+    text-align: left;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+#markers-content button:hover {
+    background: #30303d;
+    border-color: #c4b88a;
+}
+
+#markers-content button:focus {
+    outline: none;
+}
+
     </style>
 </head>
 
 <body>
+
+
+<!-- Lore Sidebar -->
+<aside id="lore-sidebar">
+    <button id="lore-toggle" type="button" title="Open lore library">
+        <span id="lore-arrow">▶</span>
+    </button>
+
+    <div id="lore-content">
+        <h2>WORLD LORE</h2>
+        <p class="lore-subtitle">Explore your world</p>
+
+        
+<button class="lore-category" id="locations-category" type="button">
+    <span>🗺️</span>
+    <span>Locations</span>
+    <span class="category-arrow" id="locations-arrow">›</span>
+</button>
+
+
+<div id="locations-list" style="display: none;">
+
+    <button class="location-item" type="button">
+        <span>Icehelm</span>
+        <small>Frostpeak Mountains</small>
+    </button>
+
+    <button class="location-item" type="button">
+        <span>Winterhold</span>
+        <small>Frostpeak Mountains</small>
+    </button>
+
+    <button class="location-item" type="button">
+        <span>Stonehearth</span>
+        <small>Western foothills</small>
+    </button>
+
+    <button class="location-item" type="button">
+        <span>Ravenford</span>
+        <small>Northern Golden Plains</small>
+    </button>
+
+    <button class="location-item" type="button">
+        <span>Oakridge</span>
+        <small>Near the Mire</small>
+    </button>
+
+    <button class="location-item" type="button">
+        <span>Sunfield</span>
+        <small>Central Golden Plains</small>
+    </button>
+
+    <button class="location-item" type="button">
+        <span>Black Marsh</span>
+        <small>Eastern marshlands</small>
+    </button>
+
+    <button class="location-item" type="button">
+        <span>Eastwatch</span>
+        <small>Eastern Golden Plains</small>
+    </button>
+
+    <button class="location-item" type="button">
+        <span>Ravenna</span>
+        <small>Eastern coast</small>
+    </button>
+
+    <button class="location-item" type="button">
+        <span>Willowbrook</span>
+        <small>Western Golden Plains</small>
+    </button>
+
+    <button class="location-item" type="button">
+        <span>Highvale</span>
+        <small>Central Golden Plains · Capital</small>
+    </button>
+
+    <button class="location-item" type="button">
+        <span>Eldertree</span>
+        <small>Emerald Wood</small>
+    </button>
+
+    <button class="location-item" type="button">
+        <span>Westhaven</span>
+        <small>Southern coast</small>
+    </button>
+
+</div>
+
+
+
+        
+<button class="lore-category" id="creatures-category" type="button">
+    <span>🐉</span>
+    <span>Creatures</span>
+    <span class="category-arrow" id="creatures-arrow">›</span>
+</button>
+
+<div id="creatures-list" style="display: none;">
+
+    <button class="location-item" type="button">
+        <span>Humans</span>
+        <small>The peoples of the known world</small>
+    </button>
+
+    <button class="location-item" type="button">
+        <span>Elves</span>
+        <small>An ancient and distinctive people</small>
+    </button>
+
+    <button class="location-item" type="button">
+        <span>Dwarves</span>
+        <small>A hardy and enduring people</small>
+    </button>
+
+    <button class="location-item" type="button">
+        <span>Alpha Dragons</span>
+        <small>The greater and more powerful dragon type</small>
+    </button>
+
+    <button class="location-item" type="button">
+        <span>Beta Dragons</span>
+        <small>The smaller and weaker dragon type</small>
+    </button>
+
+    <button class="location-item" type="button">
+        <span>Stone Giants</span>
+        <small>Four-legged beings of living stone that dwell in the mountains</small>
+    </button>
+
+    <button class="location-item" type="button">
+        <span>Deviants</span>
+        <small>A humaniod creature twisted by darkness and evil</small>
+    </button>
+
+
+</div>
+
+<!-- DM Notes -->
+<button class="lore-category" id="notes-category" type="button">
+    <span>📝</span>
+    <span>Notes</span>
+    <span class="category-arrow" id="notes-arrow">›</span>
+</button>
+
+<div id="notes-panel" style="display: none;">
+    <textarea
+        id="dm-notes"
+        placeholder="Write your campaign notes here..."
+        style="width: 100%; min-height: 220px; padding: 12px; background: #20202a; color: #f0eee8; border: 1px solid #41414e; border-radius: 5px; font-family: Segoe UI, sans-serif; font-size: 13px; resize: vertical;"
+    ></textarea>
+
+</div>
+
+<!-- DM Dice Roller -->
+<button class="lore-category" id="dice-category" type="button">
+    <span>🎲</span>
+    <span>Dice</span>
+    <span class="category-arrow" id="dice-arrow">›</span>
+</button>
+
+<div id="dice-panel" style="display: none;">
+
+    <label for="dice-minimum" style="display: block; margin-bottom: 6px; font-size: 12px;">
+        Minimum number
+    </label>
+    <input
+        id="dice-minimum"
+        type="number"
+        value="1"
+        style="width: 100%; padding: 10px; margin-bottom: 14px; background: #20202a; color: #f0eee8; border: 1px solid #41414e; border-radius: 5px;"
+    >
+
+    <label for="dice-maximum" style="display: block; margin-bottom: 6px; font-size: 12px;">
+        Maximum number
+    </label>
+    <input
+        id="dice-maximum"
+        type="number"
+        value="20"
+        style="width: 100%; padding: 10px; margin-bottom: 14px; background: #20202a; color: #f0eee8; border: 1px solid #41414e; border-radius: 5px;"
+    >
+
+    <button id="roll-dice" type="button" class="lore-category">
+        🎲 Roll
+    </button>
+
+    <p id="dice-result" style="margin-top: 12px; text-align: center; color: #e4d3a2; font-size: 24px; font-weight: 600;">
+        —
+    </p>
+
+    <p id="dice-error" style="margin-top: 6px; color: #ff9999; font-size: 12px;"></p>
+
+
+</div>
+
+<!-- DM Markers -->
+<button class="lore-category" id="markers-category" type="button">
+    <span>📍</span>
+    <span>Markers</span>
+    <span class="category-arrow" id="markers-arrow">›</span>
+</button>
+
+<div id="markers-content" style="display: none; flex-direction: column; align-items: stretch; padding: 0 0 12px;">
+
+
+    <button id="individual-tool" type="button">
+        🔵 Individual Marker
+    </button>
+
+    <label for="individual-colour" style="color: #f0eee8; font-size: 12px; margin: 4px 0 10px;">
+        Individual marker colour
+    </label>
+    <input
+        type="color"
+        id="individual-colour"
+        value="#3988ff"
+        style="width: 100%; height: 36px; margin-bottom: 12px; background: #252530; border: 1px solid #41414e; border-radius: 5px; cursor: pointer;"
+    >
+
+    <button id="group-tool" type="button">
+        🟢 Group Marker
+    </button>
+
+    <label for="group-colour" style="color: #f0eee8; font-size: 12px; margin: 4px 0 10px;">
+        Group marker colour
+    </label>
+    <input
+        type="color"
+        id="group-colour"
+        value="#28b86b"
+        style="width: 100%; height: 36px; margin-bottom: 12px; background: #252530; border: 1px solid #41414e; border-radius: 5px; cursor: pointer;"
+    >
+
+    <span id="toolbar-hint">Choose a marker tool</span>
+</div>
+
+
+
+</div>
+</aside>
+
+
+    <header id="atlas-header">
+        <div>
+            <h1>FANTASY ATLAS</h1>
+            <p>Explore a world beyond the known.</p>
+        </div>
+        <span id="atlas-status">WORLD MAP</span>
+    </header>
+
     <div id="map-container">
         <img
             id="world-map"
@@ -242,6 +744,275 @@
         container.addEventListener("pointercancel", stopDragging);
 
         drawMap();
+
+
+        // Toggle the Markers category open and closed
+        const toolbarToggle = document.getElementById("markers-category");
+        const toolbarContent = document.getElementById("markers-content");
+        const toolbarArrow = document.getElementById("markers-arrow");
+
+        toolbarToggle.addEventListener("click", function() {
+            const isOpen = toolbarContent.style.display !== "none";
+
+            toolbarContent.style.display = isOpen ? "none" : "flex";
+            toolbarArrow.textContent = isOpen ? "›" : "⌄";
+        });
+
+
+        // Track the selected marker tool
+        let selectedMarkerType = null;
+
+        const individualTool = document.getElementById("individual-tool");
+        const groupTool = document.getElementById("group-tool");
+
+        
+individualTool.addEventListener("click", function() {
+    if (selectedMarkerType === "individual") {
+        selectedMarkerType = null;
+        toolbarHint.textContent = "Marker placement deactivated";
+    } else {
+        selectedMarkerType = "individual";
+        toolbarHint.textContent = "Click the map to place an individual marker";
+    }
+
+    updateMarkerTools();
+});
+
+groupTool.addEventListener("click", function() {
+    if (selectedMarkerType === "group") {
+        selectedMarkerType = null;
+        toolbarHint.textContent = "Marker placement deactivated";
+    } else {
+        selectedMarkerType = "group";
+        toolbarHint.textContent = "Click the map to place a group marker";
+    }
+
+    updateMarkerTools();
+});
+
+
+        const toolbarHint = document.getElementById("toolbar-hint");
+
+        function updateMarkerTools() {
+            individualTool.style.borderColor =
+                selectedMarkerType === "individual" ? "#5799ff" : "#41414e";
+
+            groupTool.style.borderColor =
+                selectedMarkerType === "group" ? "#54c987" : "#41414e";
+        }
+
+
+        
+        // Place and remove temporary campaign markers
+        const markersLayer = document.createElement("div");
+        markersLayer.id = "markers-layer";
+
+        Object.assign(markersLayer.style, {
+            position: "absolute",
+            top: "0",
+            left: "0",
+            width: "100%",
+            height: "100%",
+            zIndex: "4",
+            pointerEvents: "none"
+        });
+
+        container.appendChild(markersLayer);
+
+        // Keep the marker layer aligned with the map
+        function updateMarkersLayer() {
+            markersLayer.style.transform =
+                `translate(${offsetX}px, ${offsetY}px) scale(${zoom})`;
+            markersLayer.style.transformOrigin = "top left";
+        }
+
+        // Replace drawMap with a version that also moves the markers
+        const drawMapOriginal = drawMap;
+
+        drawMap = function() {
+            drawMapOriginal();
+            updateMarkersLayer();
+        };
+
+        // Place or remove markers
+        container.addEventListener("click", function(event) {
+            if (event.target.closest("button")) return;
+
+// If a marker was clicked, remove it and stop here
+if (event.target.closest(".campaign-marker")) {
+    return;
+}
+
+            if (!selectedMarkerType || dragging) return;
+
+            const rect = container.getBoundingClientRect();
+            const screenX = event.clientX - rect.left;
+            const screenY = event.clientY - rect.top;
+
+            const mapX = (screenX - offsetX) / zoom;
+            const mapY = (screenY - offsetY) / zoom;
+
+            
+const marker = document.createElement("div");
+marker.className = "campaign-marker";
+
+const isGroup = selectedMarkerType === "group";
+const markerSize = isGroup ? "24px" : "18px";
+
+Object.assign(marker.style, {
+    position: "absolute",
+    left: mapX + "px",
+    top: mapY + "px",
+    width: markerSize,
+    height: markerSize,
+    boxSizing: "border-box",
+    borderRadius: "50%",
+    background: isGroup
+        ? document.getElementById("group-colour").value
+        : document.getElementById("individual-colour").value,
+    border: "2px solid white",
+    boxShadow: "0 0 8px rgba(0,0,0,0.7)",
+    transform: "translate(-50%, -50%)",
+    pointerEvents: "auto",
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    color: "white",
+    fontSize: "13px",
+    fontWeight: "bold"
+});
+
+if (isGroup) {
+    marker.textContent = "G";
+}
+
+marker.title = isGroup
+    ? "Group marker — click to remove"
+    : "Individual marker — click to remove";
+
+
+            marker.addEventListener("pointerdown", function(event) {
+    event.stopPropagation();
+});
+
+marker.addEventListener("click", function(event) {
+    event.stopPropagation();
+    event.preventDefault();
+    marker.remove();
+});
+markersLayer.appendChild(marker);
+        });
+
+        updateMarkersLayer();
+
+        // Lore sidebar: open and close
+        const loreSidebar = document.getElementById("lore-sidebar");
+        const loreToggle = document.getElementById("lore-toggle");
+        const loreArrow = document.getElementById("lore-arrow");
+
+        loreToggle.addEventListener("click", function() {
+            loreSidebar.classList.toggle("open");
+
+            const isOpen = loreSidebar.classList.contains("open");
+
+            loreArrow.textContent = isOpen ? "◀" : "▶";
+            loreToggle.title = isOpen
+                ? "Close lore library"
+                : "Open lore library";
+        });
+
+
+        // Toggle the Locations list
+        const locationsCategory = document.getElementById("locations-category");
+        const locationsList = document.getElementById("locations-list");
+        const locationsArrow = document.getElementById("locations-arrow");
+
+        locationsCategory.addEventListener("click", function() {
+            const isOpen = locationsList.style.display !== "none";
+
+            locationsList.style.display = isOpen ? "none" : "block";
+            locationsArrow.textContent = isOpen ? "›" : "⌄";
+        });
+
+// Toggle the Creatures list
+const creaturesCategory = document.getElementById("creatures-category");
+const creaturesList = document.getElementById("creatures-list");
+const creaturesArrow = document.getElementById("creatures-arrow");
+
+creaturesCategory.addEventListener("click", function() {
+    const isOpen = creaturesList.style.display !== "none";
+
+    creaturesList.style.display = isOpen ? "none" : "block";
+    creaturesArrow.textContent = isOpen ? "›" : "⌄";
+});
+
+// Toggle the DM Notes panel
+const notesCategory = document.getElementById("notes-category");
+const notesPanel = document.getElementById("notes-panel");
+const notesArrow = document.getElementById("notes-arrow");
+
+notesCategory.addEventListener("click", function() {
+    const isOpen = notesPanel.style.display !== "none";
+
+    notesPanel.style.display = isOpen ? "none" : "block";
+    notesArrow.textContent = isOpen ? "›" : "⌄";
+});
+
+// Automatically save DM Notes in this browser
+const dmNotes = document.getElementById("dm-notes");
+
+// Load previously saved notes
+dmNotes.value = localStorage.getItem("fantasyAtlasNotes") || "";
+
+// Save whenever the DM types
+dmNotes.addEventListener("input", function() {
+    localStorage.setItem("fantasyAtlasNotes", dmNotes.value);
+});
+
+// Toggle the Dice panel
+const diceCategory = document.getElementById("dice-category");
+const dicePanel = document.getElementById("dice-panel");
+const diceArrow = document.getElementById("dice-arrow");
+
+diceCategory.addEventListener("click", function() {
+    const isOpen = dicePanel.style.display !== "none";
+
+    dicePanel.style.display = isOpen ? "none" : "block";
+    diceArrow.textContent = isOpen ? "›" : "⌄";
+});
+
+// Roll a random integer
+const diceMinimum = document.getElementById("dice-minimum");
+const diceMaximum = document.getElementById("dice-maximum");
+const rollDice = document.getElementById("roll-dice");
+const diceResult = document.getElementById("dice-result");
+const diceError = document.getElementById("dice-error");
+
+rollDice.addEventListener("click", function() {
+    const min = Number(diceMinimum.value);
+    const max = Number(diceMaximum.value);
+
+    if (
+        diceMinimum.value.trim() === "" ||
+        diceMaximum.value.trim() === "" ||
+        !Number.isSafeInteger(min) ||
+        !Number.isSafeInteger(max) ||
+        min > max
+    ) {
+        diceError.textContent =
+            "Enter whole numbers, with the minimum no greater than the maximum.";
+        diceResult.textContent = "—";
+        return;
+    }
+
+    diceError.textContent = "";
+
+    const result = Math.floor(Math.random() * (max - min + 1)) + min;
+
+    diceResult.textContent = result;
+});
+
     </script>
 </body>
 </html>

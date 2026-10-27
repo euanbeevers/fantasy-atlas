@@ -497,6 +497,15 @@
     </button>
 
 
+
+    <button
+        id="add-creature"
+        type="button"
+        style="width: 100%; padding: 12px; margin-top: 4px; margin-bottom: 12px; background: #252530; border: 1px solid #c4b88a; border-radius: 5px; color: #e4d3a2; font-size: 13px; cursor: pointer;"
+    >
+        + Add Creature
+    </button>
+
 </div>
 
 <!-- DM Notes -->
@@ -556,6 +565,35 @@
 
 
 </div>
+
+<!-- DM Side Quests -->
+<button class="lore-category" id="side-quests-category" type="button">
+    <span>⚔️</span>
+    <span>Side Quests</span>
+    <span class="category-arrow" id="side-quests-arrow">›</span>
+</button>
+
+
+<div id="side-quests-panel" style="display: none;">
+    <p style="color: #9999a8; font-size: 12px; padding: 8px 4px 12px;">
+        Select a location in the 'locations' bar to find a quest in that area
+    </p>
+
+    <button
+        id="generate-quest"
+        type="button"
+        style="width: 100%; padding: 12px; margin-bottom: 12px; background: #252530; border: 1px solid #c4b88a; border-radius: 5px; color: #e4d3a2; font-size: 13px; cursor: pointer;"
+    >
+        ⚔️ Find a Quest
+    </button>
+
+    <div id="quest-display" style="display: none; padding: 12px; background: #20202a; border: 1px solid #41414e; border-radius: 5px;">
+        <h3 id="quest-title" style="color: #e4d3a2; font-size: 14px; margin-bottom: 8px;"></h3>
+
+        <p id="quest-description" style="color: #f0eee8; font-size: 12px; line-height: 1.6;"></p>
+    </div>
+</div>
+
 
 <!-- DM Markers -->
 <button class="lore-category" id="markers-category" type="button">
@@ -639,9 +677,10 @@
         </div>
     </div>
 
-    <script>
-        const container = document.getElementById("map-container");
-        const map = document.getElementById("world-map");
+        <script src="quests.js"></script>
+<script>
+    const container = document.getElementById("map-container");
+    const map = document.getElementById("world-map");
 
         let zoom = 1;
         const minZoom = 0.25;
@@ -935,6 +974,23 @@ markersLayer.appendChild(marker);
             locationsArrow.textContent = isOpen ? "›" : "⌄";
         });
 
+// Select a location for the quest generator
+document.querySelectorAll("#locations-list .location-item").forEach(function(button) {
+    button.addEventListener("click", function() {
+        selectedQuestLocation = button.querySelector("span").textContent;
+
+document.getElementById("atlas-status").textContent = selectedQuestLocation.toUpperCase();
+
+        remainingGlobalQuests = [
+            ...(questDatabase.locations[selectedQuestLocation] || [])
+        ];
+
+        questDisplay.style.display = "none";
+
+        console.log("Selected quest location:", selectedQuestLocation);
+    });
+});
+
 // Toggle the Creatures list
 const creaturesCategory = document.getElementById("creatures-category");
 const creaturesList = document.getElementById("creatures-list");
@@ -946,6 +1002,170 @@ creaturesCategory.addEventListener("click", function() {
     creaturesList.style.display = isOpen ? "none" : "block";
     creaturesArrow.textContent = isOpen ? "›" : "⌄";
 });
+
+
+
+const addCreatureButton = document.getElementById("add-creature");
+
+function addRemoveButton(creatureButton) {
+    const removeButton = document.createElement("button");
+    removeButton.type = "button";
+    removeButton.textContent = "−";
+
+    removeButton.style.cssText = `
+        position: absolute;
+        top: 5px;
+        right: 7px;
+        background: transparent;
+        border: none;
+        color: #c4b88a;
+        font-size: 20px;
+        cursor: pointer;
+        padding: 0 5px;
+        line-height: 1;
+    `;
+
+    removeButton.addEventListener("click", function(event) {
+    event.stopPropagation();
+
+    removeCreatureWithUndo(creatureButton);
+});
+
+    creatureButton.style.position = "relative";
+    creatureButton.appendChild(removeButton);
+}
+
+let undoTimer;
+let removedCreature = null;
+let undoNotification = null;
+
+function removeCreatureWithUndo(creatureButton) {
+    // Cancel any previous undo timer
+    clearTimeout(undoTimer);
+
+    // Remove the previous notification
+    if (undoNotification) {
+        undoNotification.remove();
+    }
+
+    // Remember where the creature was
+    const parent = creatureButton.parentNode;
+    const nextSibling = creatureButton.nextSibling;
+
+    removedCreature = {
+        element: creatureButton,
+        parent: parent,
+        nextSibling: nextSibling
+    };
+
+    // Remove the creature
+    creatureButton.remove();
+
+    // Create the bottom-of-screen notification
+    undoNotification = document.createElement("div");
+    undoNotification.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 999999;
+        background: #211d2d;
+        color: #f3efff;
+        border: 1px solid #c4b88a;
+        border-radius: 8px;
+        padding: 12px 18px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        font-family: Arial, sans-serif;
+        font-size: 14px;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.5);
+    `;
+
+    const message = document.createElement("span");
+    message.textContent = "Creature removed";
+
+    const undoButton = document.createElement("button");
+    undoButton.type = "button";
+    undoButton.textContent = "Undo";
+    undoButton.style.cssText = `
+        background: transparent;
+        color: #c4b88a;
+        border: 1px solid #c4b88a;
+        border-radius: 5px;
+        padding: 5px 10px;
+        cursor: pointer;
+        font-weight: bold;
+    `;
+
+    undoButton.addEventListener("click", function() {
+        clearTimeout(undoTimer);
+
+        if (removedCreature) {
+            const item = removedCreature;
+
+            if (item.nextSibling && item.nextSibling.parentNode === item.parent) {
+                item.parent.insertBefore(item.element, item.nextSibling);
+            } else {
+                item.parent.appendChild(item.element);
+            }
+        }
+
+        undoNotification.remove();
+        undoNotification = null;
+        removedCreature = null;
+    });
+
+    undoNotification.appendChild(message);
+    undoNotification.appendChild(undoButton);
+    document.body.appendChild(undoNotification);
+
+    // Automatically dismiss after 7.5 seconds
+    undoTimer = setTimeout(function() {
+        if (undoNotification) {
+            undoNotification.remove();
+            undoNotification = null;
+        }
+
+        removedCreature = null;
+    }, 7500);
+}
+
+// Add remove buttons to the creatures already listed
+document.querySelectorAll("#creatures-list .location-item").forEach(function(creature) {
+    addRemoveButton(creature);
+});
+
+addCreatureButton.addEventListener("click", function() {
+    const name = prompt("What is the creature called?");
+
+    if (!name || !name.trim()) {
+        return;
+    }
+
+    const description = prompt("Give the creature a short description:");
+
+    const creatureButton = document.createElement("button");
+    creatureButton.className = "location-item";
+    creatureButton.type = "button";
+
+    const creatureName = document.createElement("span");
+    creatureName.textContent = name.trim();
+
+    const creatureDescription = document.createElement("small");
+    creatureDescription.textContent =
+        description && description.trim()
+            ? description.trim()
+            : "No description added yet";
+
+    creatureButton.appendChild(creatureName);
+    creatureButton.appendChild(creatureDescription);
+
+    addRemoveButton(creatureButton);
+    addCreatureButton.before(creatureButton);
+});
+
+
 
 // Toggle the DM Notes panel
 const notesCategory = document.getElementById("notes-category");
@@ -1012,6 +1232,59 @@ rollDice.addEventListener("click", function() {
 
     diceResult.textContent = result;
 });
+
+
+ // Toggle the DM Side Quests panel
+const sideQuestsCategory = document.getElementById("side-quests-category");
+const sideQuestsPanel = document.getElementById("side-quests-panel");
+const sideQuestsArrow = document.getElementById("side-quests-arrow");
+
+sideQuestsCategory.addEventListener("click", function() {
+    const isOpen = sideQuestsPanel.style.display !== "none";
+
+    sideQuestsPanel.style.display = isOpen ? "none" : "block";
+    sideQuestsArrow.textContent = isOpen ? "›" : "⌄";
+});
+
+
+ 
+ 
+ // Generate quests without repeating until the pool is exhausted
+const generateQuestButton = document.getElementById("generate-quest");
+const questDisplay = document.getElementById("quest-display");
+const questTitle = document.getElementById("quest-title");
+const questDescription = document.getElementById("quest-description");
+
+let selectedQuestLocation = "Icehelm";
+let remainingGlobalQuests = [...(questDatabase.locations[selectedQuestLocation] || [])];
+
+generateQuestButton.addEventListener("click", function() {
+    // Reset the pool after every quest has been seen
+    if (remainingGlobalQuests.length === 0) {
+    remainingGlobalQuests = [
+        ...(questDatabase.locations[selectedQuestLocation] || [])
+    ];
+}
+
+    if (remainingGlobalQuests.length === 0) {
+        questTitle.textContent = "No quests available";
+        questDescription.textContent = "There are currently no quests in this location.";
+        questDisplay.style.display = "block";
+        return;
+    }
+
+    // Pick a random quest that hasn't been seen this cycle
+    const randomIndex = Math.floor(
+        Math.random() * remainingGlobalQuests.length
+    );
+
+    const quest = remainingGlobalQuests.splice(randomIndex, 1)[0];
+
+    questTitle.textContent = quest.title;
+    questDescription.textContent = quest.description;
+    questDisplay.style.display = "block";
+});
+
 
     </script>
 </body>
